@@ -164,9 +164,12 @@ func (p *LogsPump) pumpLogs(event *docker.APIEvents, backlog bool, inactivityTim
 	}
 
 	var sinceTime time.Time
+	var tail string
 	if backlog {
+		tail = "all"
 		sinceTime = time.Unix(0, 0)
 	} else {
+		tail = "0"
 		sinceTime = time.Now()
 	}
 
@@ -191,9 +194,10 @@ func (p *LogsPump) pumpLogs(event *docker.APIEvents, backlog bool, inactivityTim
 				Stdout:            true,
 				Stderr:            true,
 				Follow:            true,
-				Tail:              "all",
+				Tail:              tail,
 				Since:             sinceTime.Unix(),
 				InactivityTimeout: inactivityTimeout,
+				RawTerminal:       true,
 			})
 			if err != nil {
 				debug("pump.pumpLogs():", id, "stopped with error:", err)
